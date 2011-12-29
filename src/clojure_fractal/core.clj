@@ -1,7 +1,9 @@
 (ns clojure-fractal.core
   (:import [javax.swing JFrame JLabel]
            [java.awt Graphics Dimension Color]
-           [java.awt.image BufferedImage]))
+           [java.awt.image BufferedImage]
+           [javax.imageio ImageIO]
+           [java.io File]))
 
 (defn add
   [c1 c2]
@@ -84,6 +86,14 @@
       (.add canvas)
       (.setSize (Dimension. size size))
       (.show))))
+
+(defn export [{buffer :buffer size :size}]
+  (let [image (BufferedImage. size size BufferedImage/TYPE_INT_RGB)
+        canvas (proxy [JLabel] []
+                 (paint [g] (.drawImage g image 0 0 this)))
+        file (File. "fractal.png")]
+    (paint-canvas buffer size (.createGraphics image))
+    (ImageIO/write image "png" file)))
 
 (def fractal {:buffer (make-array Integer/TYPE 800 800) :size 800 :iteration 50})
 
